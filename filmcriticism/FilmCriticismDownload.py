@@ -4,6 +4,7 @@ import requests
 import time
 import random
 import json
+import util.DateUtil as dateUtil
 
 
 def parsePage(html):
@@ -17,7 +18,7 @@ def parsePage(html):
             'rate': item['score']
 
         }
-    # return json.loads(html)['cmts']
+        # return json.loads(html)['cmts']
 
 
 
@@ -28,36 +29,34 @@ def getPage(url):
     return None
 
 
-def save_to_txt(filmId):
-    for i in range(1, 56):
-
-        print("开始保存第%d页" % i)
+def downloadAndSaveFile(filmId, pageCount):
+    for i in range(1, pageCount + 1):
+        print("%s,page=%d" % (dateUtil.timeToStr(time.localtime()), i))
         url = 'http://m.maoyan.com/mmdb/comments/movie/' + filmId + '.json?_v_=yes&offset=' + str(i)
-
         html = getPage(url)
         data = parsePage(html)
         for item in data:
-            with open('爱情公寓评论.txt', 'a', encoding='utf-8') as f:
+            with open('Original_LoveApartment.txt', 'a', encoding='utf-8') as f:
                 # f.write(item['date'] + ','+item['nickname'] + ',' + item['city'] + ',' + str(item['rate']) + ',' + item['conment']+'\n')
                 f.write(json.dumps(item, ensure_ascii=False) + '\n')
                 #time.sleep(random.randint(1,100)/20)
-        time.sleep(2) #休眠3秒
+        time.sleep(2)
 
 
-def delete_repeat(old, new):
+def duplicateRemoval(old, new):
     oldfile = open(old, 'r', encoding='utf-8')
     newfile = open(new, 'w', encoding='utf-8')
-    content_list = oldfile.readlines() #获取所有评论数据集
-    content_alread = [] #存储去重后的评论数据集
-
+    content_list = oldfile.readlines()
+    content_alread = []
     for line in content_list:
         if line not in content_alread:
-            newfile.write(line+'\n')
+            newfile.write(line)
             content_alread.append(line)
 
 
 if __name__ == '__main__':
     filmId = '1175253' #爱情公寓猫眼ID
-    #save_to_txt(filmId)
-    delete_repeat('爱情公寓评论.txt', '爱情公寓_new.txt')
+    pageCount = 10 #下载页数
+    downloadAndSaveFile(filmId,pageCount)
+    duplicateRemoval(r'Original_LoveApartment.txt', r'DuplicateRemoval_LoveApartment.txt')
     print("end")
