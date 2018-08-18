@@ -29,14 +29,14 @@ def getPage(url):
     return None
 
 
-def downloadAndSaveFile(filmId, pageCount):
+def downloadAndSaveFile(filmId, pageCount, filename):
     for i in range(1, pageCount + 1):
         print("%s,page=%d" % (dateUtil.timeToStr(time.localtime()), i))
         url = 'http://m.maoyan.com/mmdb/comments/movie/' + filmId + '.json?_v_=yes&offset=' + str(i)
         html = getPage(url)
         data = parsePage(html)
         for item in data:
-            with open('Original_LoveApartment.txt', 'a', encoding='utf-8') as f:
+            with open(filename + '.txt', 'a', encoding='utf-8') as f:
                 # f.write(item['date'] + ','+item['nickname'] + ',' + item['city'] + ',' + str(item['rate']) + ',' + item['conment']+'\n')
                 f.write(json.dumps(item, ensure_ascii=False) + '\n')
                 #time.sleep(random.randint(1,100)/20)
@@ -55,8 +55,11 @@ def duplicateRemoval(old, new):
 
 
 if __name__ == '__main__':
-    filmId = '1175253' #爱情公寓猫眼ID
+    #爱情公寓
+    filmId = '1175253'
+    filename = '爱情公寓'
+
     pageCount = 10 #下载页数
-    downloadAndSaveFile(filmId,pageCount)
-    duplicateRemoval(r'Original_LoveApartment.txt', r'DuplicateRemoval_LoveApartment.txt')
+    downloadAndSaveFile(filmId, pageCount, filename)
+    duplicateRemoval(filename + '.txt', filename + '(去重).txt')
     print("end")
